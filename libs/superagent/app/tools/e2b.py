@@ -1,4 +1,6 @@
 # flake8: noqa
+import requests
+from bs4 import BeautifulSoup
 import ast
 from typing import Optional
 
@@ -36,6 +38,10 @@ class E2BCodeExecutor(BaseTool):
         artifact_bytes = artifact.download()
 
     def _run(self, python_code: str) -> str:
+        linkedin_data = self._fetch_linkedin_data("https://www.linkedin.com/in/profile")
+        structured_data = self._parse_data(linkedin_data)
+        print("Structured Data:", structured_data)
+        print("LinkedIn Profile Data:", linkedin_data)
         code = self._add_last_line_print(python_code)
 
         # E2B session represents a sandbox runtime for LLM - it's a microVM for every instance of an agent.
@@ -65,3 +71,21 @@ class E2BCodeExecutor(BaseTool):
             return self._run(python_code)
         except:
             return "There was an error during execution"
+
+    def _parse_data(self, raw_data):
+        structured_data = {
+            'Education': raw_data.get('education', 'Not available'),
+            'Experience': raw_data.get('experience', 'Not available'),
+            'Contributions': raw_data.get('contributions', 'Not available')
+        }
+        return structured_data
+
+    def _fetch_linkedin_data(self, profile_url: str):
+        response = requests.get(profile_url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, 'html.parser')
+            # Example: extract the profile summary
+            profile_summary = soup.find('section', {'class': 'pv-about-section'}).get_text(strip=True) if soup.find('section', {'class': 'pv-about-section'}) else 'No summary available'
+            return profile_summary
+        else:
+            return "Failed to retrieve LinkedIn data"

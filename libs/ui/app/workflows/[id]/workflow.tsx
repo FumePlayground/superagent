@@ -7,6 +7,9 @@ import { RxActivityLog, RxPieChart, RxPlay } from "react-icons/rx"
 
 import { initialSamlValue } from "@/config/saml"
 import { Api } from "@/lib/api"
+import { sendEmail } from "@/lib/email"
+import { notify } from "@/lib/notification"
+import { logEvent } from "@/lib/logger"
 import {
   ResizableHandle,
   ResizablePanel,
@@ -35,12 +38,28 @@ export default function WorkflowDetail({
   const [isLLMModalOpen, setIsLLMModalOpen] = React.useState<boolean>(
     llms.length === 0
   )
+  const [notificationMessage, setNotificationMessage] = React.useState('');
+  const [notificationType, setNotificationType] = React.useState('');
 
   const handleLLMSave = React.useCallback(async () => {
     const api = new Api(profile.api_key)
     await api.generateWorkflow(workflow.id, initialSamlValue)
     router.refresh()
   }, [workflow, profile, router])
+
+  const handleReportSubmission = async () => {
+    try {
+      const report = await api.generateReport(workflow.id); // Generate the report
+      await sendEmail(profile.email, report); // Send the report via email
+      logEvent('Report sent', { workflowId: workflow.id, userId: profile.id }); // Log the event of sending the report
+      setNotificationMessage('Report submission successful');
+      setNotificationType('success');
+    } catch (error) {
+      logEvent('Error sending report', { error: error.message }); // Log any errors that occur
+      setNotificationMessage('Report submission failed');
+      setNotificationType('error');
+    }
+  };
 
   return (
     <div className="flex max-h-screen flex-1 flex-col space-y-5 pt-6">
@@ -55,6 +74,10 @@ export default function WorkflowDetail({
       />
 
       <Header workflow={workflow} profile={profile} />
+      <button onClick={handleReportSubmission} className='px-4 py-2 mt-4 bg-blue-500 text-white rounded shadow'>
+        Submit Report
+      </button>
+      <Notification message={notificationMessage} type={notificationType} />
 
       <Tabs
         defaultValue="saml"
