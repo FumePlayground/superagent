@@ -101,3 +101,10 @@ To help with contributions, you can search, navigate, and understand Superagent'
 <a href="https://github.com/homanp/superagent/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=homanp/superagent" />
 </a>
+
+## Beta Phase Contributions
+
+During the beta phase, we are focusing on testing and feedback.
+Therefore, **we are not accepting pull requests containing integrations with fume.ai**.
+Please limit contributions to bug reports and feature requests through Issues *only*.
+For guidelines on submitting issues, see [Contributing to Superagent](https://github.com/homanp/Superagent/blob/main/.github/CONTRIBUTING.md).
