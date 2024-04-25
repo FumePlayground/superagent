@@ -101,3 +101,8 @@ To help with contributions, you can search, navigate, and understand Superagent'
 <a href="https://github.com/homanp/superagent/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=homanp/superagent" />
 </a>
+
+
+## Acknowledgments
+
+We would like to extend our gratitude to Fume.ai for allowing us to test their powerful agent for free.
